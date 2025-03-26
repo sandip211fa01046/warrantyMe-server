@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Letter from "../models/Letter";
+import Letter from "../Model/Letter";
 import { google } from "googleapis";
 
 const oauth2Client = new google.auth.OAuth2(
