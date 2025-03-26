@@ -20,14 +20,18 @@ const ensureLettersFolder = async (): Promise<string> => {
     fields: "files(id, name)",
   });
 
-  if (res.data.files?.length) {
+  if (res.data.files && res.data.files.length > 0) {
     lettersFolderId = res.data.files[0].id!;
   } else {
     const folder = await drive.files.create({
-      resource: { name: "Letters", mimeType: "application/vnd.google-apps.folder" },
+      requestBody: {
+        name: "Letters",
+        mimeType: "application/vnd.google-apps.folder",
+      },
       fields: "id",
     });
-    lettersFolderId = folder.data.id!;
+
+    lettersFolderId = folder.data.id || "";
   }
 
   return lettersFolderId;
@@ -55,10 +59,20 @@ export const uploadToDrive = async (req: Request, res: Response) => {
       parents: [folderId],
       mimeType: "application/vnd.google-apps.document",
     };
-    const media = { mimeType: "text/html", body: `<html><body>${content}</body></html>` };
-    const response = await drive.files.create({ resource: fileMetadata, media, fields: "id" });
+    const media = {
+      mimeType: "text/html",
+      body: `<html><body>${content}</body></html>`,
+    };
+
+    const response = await drive.files.create({
+      requestBody: fileMetadata,
+      media: media,
+      fields: "id",
+    });
+
     res.json({ fileId: response.data.id });
   } catch (error) {
+    console.error("Error uploading to Google Drive:", error);
     res.status(500).json({ error: "Failed to upload to Google Drive" });
   }
 };
