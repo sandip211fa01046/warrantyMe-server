@@ -7,7 +7,11 @@ import letterRoutes from "./Routes/letterRoutes";
 dotenv.config();
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: ["https://30mgenomics.vercel.app"],
+  methods: ["GET", "POST", "DELETE", "PUT"],
+}));
+
 
 mongoose
   .connect(process.env.MONGO_URI || "")
